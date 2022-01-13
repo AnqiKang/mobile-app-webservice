@@ -9,6 +9,9 @@ import com.kang.app.ws.shared.UserDto;
 import com.kang.app.ws.shared.Utils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -99,6 +103,27 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(userEntity);
     }
 
+    @Override
+    public List<UserDto> getUsers(int page, int limit) {
+        List<UserDto> userDtoList = new ArrayList<>();
+
+        if (page > 0) {
+            page -= 1;
+        }
+
+        Pageable pageableResult = PageRequest.of(page, limit);
+        Page<UserEntity> usersPage = userRepository.findAll(pageableResult);
+        List<UserEntity> userEntityList = usersPage.getContent();
+
+        for (UserEntity userEntity : userEntityList) {
+            UserDto userDto = new UserDto();
+            BeanUtils.copyProperties(userEntity, userDto);
+            userDtoList.add(userDto);
+        }
+
+        return userDtoList;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -106,7 +131,6 @@ public class UserServiceImpl implements UserService {
         if (userEntity == null) {
             throw new UsernameNotFoundException(email);
         }
-
         return new User(userEntity.getEmail(), userEntity.getEncryptPassword(), new ArrayList<>());
 
     }
