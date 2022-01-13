@@ -1,6 +1,8 @@
 package com.kang.app.ws.controller;
 
+import com.kang.app.ws.exceptions.UserServiceException;
 import com.kang.app.ws.model.request.UserDetailsRequestModel;
+import com.kang.app.ws.model.response.ErrorMessages;
 import com.kang.app.ws.model.response.UserRest;
 import com.kang.app.ws.service.UserService;
 import com.kang.app.ws.shared.UserDto;
@@ -36,8 +38,12 @@ public class UserController {
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
+    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
         UserRest userRest = new UserRest();
+
+        if (userDetails.getFirstName().isEmpty()) {
+            throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FILED.getErrorMessage());
+        }
 
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(userDetails, userDto);
