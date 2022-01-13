@@ -2,8 +2,7 @@ package com.kang.app.ws.controller;
 
 import com.kang.app.ws.exceptions.UserServiceException;
 import com.kang.app.ws.model.request.UserDetailsRequestModel;
-import com.kang.app.ws.model.response.ErrorMessages;
-import com.kang.app.ws.model.response.UserRest;
+import com.kang.app.ws.model.response.*;
 import com.kang.app.ws.service.UserService;
 import com.kang.app.ws.shared.UserDto;
 import org.springframework.beans.BeanUtils;
@@ -70,8 +69,15 @@ public class UserController {
         return userRest;
     }
 
-    @DeleteMapping
-    public String deleteUser() {
-        return "delete user was called";
+    @DeleteMapping(value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public OperationStatusModel deleteUser(@PathVariable String id) {
+        OperationStatusModel operationStatusModel = new OperationStatusModel();
+
+        operationStatusModel.setOperationName(RequestOperationName.DELETE.name());
+        userService.deleteUser(id);
+        operationStatusModel.setOperationResult(RequestOperationStatus.SUCCESS.name());
+
+        return operationStatusModel;
     }
 }
