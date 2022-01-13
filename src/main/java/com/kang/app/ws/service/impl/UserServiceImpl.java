@@ -1,6 +1,8 @@
 package com.kang.app.ws.service.impl;
 
 import com.kang.app.ws.entity.UserEntity;
+import com.kang.app.ws.exceptions.UserServiceException;
+import com.kang.app.ws.model.response.ErrorMessages;
 import com.kang.app.ws.repository.UserRepository;
 import com.kang.app.ws.service.UserService;
 import com.kang.app.ws.shared.UserDto;
@@ -70,6 +72,24 @@ public class UserServiceImpl implements UserService {
 
         return userDto;
     }
+
+    @Override
+    public UserDto updateUser(String id, UserDto userDto) {
+        UserEntity userEntity = userRepository.findByUserId(id);
+        if(userEntity == null){
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+
+        UserDto returnValue = new UserDto();
+
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+
+        UserEntity updatedUserEntity = userRepository.save(userEntity);
+        BeanUtils.copyProperties(updatedUserEntity, returnValue);
+        return returnValue;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
