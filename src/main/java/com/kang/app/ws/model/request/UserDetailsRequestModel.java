@@ -12,7 +12,6 @@ public class UserDetailsRequestModel {
     private String password;
 
 
-
     public String getFirstName() {
         return firstName;
     }

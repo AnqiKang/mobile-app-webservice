@@ -1,8 +1,9 @@
 package com.kang.app.ws.model.response;
 
+import java.util.List;
+
 /**
  * convert Object into outgoing JSON response
- *
  * contains only details that we want to return to the User, back to controller
  * no any sensitive info
  */
@@ -11,7 +12,6 @@ public class UserRest {
     private String firstName;
     private String lastName;
     private String email;
-
 
     public String getUserId() {
         return userId;
