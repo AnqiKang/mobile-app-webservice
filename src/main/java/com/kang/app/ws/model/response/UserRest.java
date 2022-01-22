@@ -1,5 +1,7 @@
 package com.kang.app.ws.model.response;
 
+import java.util.List;
+
 /**
  * convert Object into outgoing JSON response
  *
@@ -12,6 +14,15 @@ public class UserRest {
     private String lastName;
     private String email;
 
+    private List<AddressRest> addresses;
+
+    public List<AddressRest> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressRest> addresses) {
+        this.addresses = addresses;
+    }
 
     public String getUserId() {
         return userId;

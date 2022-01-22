@@ -29,15 +29,16 @@ public class UserController {
     )
     public List<UserRest> getUsers(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "limit", defaultValue = "25") int limit) {
+            @RequestParam(value = "limit", defaultValue = "2") int limit) {
 
         List<UserRest> userRestList = new ArrayList<>();
         List<UserDto> userDtoList = userService.getUsers(page, limit);
 
         // convert DTO to UserRest
         for (UserDto userDto : userDtoList) {
-            UserRest userRest = new UserRest();
-            BeanUtils.copyProperties(userDto, userRest);
+//            UserRest userRest = new UserRest();
+//            BeanUtils.copyProperties(userDto, userRest);
+            UserRest userRest = new ModelMapper().map(userDto,UserRest.class);
             userRestList.add(userRest);
         }
 
@@ -49,10 +50,12 @@ public class UserController {
     @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public UserRest getUser(@PathVariable String id) {
-        UserRest userRest = new UserRest();
+        //UserRest userRest = new UserRest();
 
+        ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = userService.getUserByUserId(id);
-        BeanUtils.copyProperties(userDto, userRest);
+        UserRest userRest = modelMapper.map(userDto, UserRest.class);
+        //BeanUtils.copyProperties(userDto, userRest);
 
         return userRest;
     }
@@ -81,12 +84,11 @@ public class UserController {
     )
     public UserRest updateUser(@PathVariable String id,
                                @RequestBody UserDetailsRequestModel userDetailsRequestModel) {
-        UserRest userRest = new UserRest();
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(userDetailsRequestModel, userDto);
+
+        UserDto userDto = new ModelMapper().map(userDetailsRequestModel, UserDto.class);
 
         UserDto updatedUser = userService.updateUser(id, userDto);
-        BeanUtils.copyProperties(updatedUser, userRest);
+        UserRest userRest = new ModelMapper().map(updatedUser, UserRest.class);
 
         return userRest;
     }

@@ -72,18 +72,20 @@ public class UserServiceImpl implements UserService {
         }
         UserDto returnValue = new UserDto();
         BeanUtils.copyProperties(userEntity, returnValue);
+       // UserDto returnValue = new ModelMapper().map(userEntity, UserDto.class);
+
         return returnValue;
     }
 
     @Override
     public UserDto getUserByUserId(String userId) {
-        UserDto userDto = new UserDto();
+        //UserDto userDto = new UserDto();
         UserEntity userEntity = userRepository.findByUserId(userId);
         if (userEntity == null) {
             throw new UsernameNotFoundException("User with ID " + userId + " Not Found");
         }
-        BeanUtils.copyProperties(userEntity, userDto);
-
+        //BeanUtils.copyProperties(userEntity, userDto);
+        UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
         return userDto;
     }
 
@@ -94,13 +96,12 @@ public class UserServiceImpl implements UserService {
             throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
         }
 
-        UserDto returnValue = new UserDto();
-
         userEntity.setFirstName(userDto.getFirstName());
         userEntity.setLastName(userDto.getLastName());
-
         UserEntity updatedUserEntity = userRepository.save(userEntity);
-        BeanUtils.copyProperties(updatedUserEntity, returnValue);
+//        UserDto returnValue = new UserDto();
+//        BeanUtils.copyProperties(updatedUserEntity, returnValue);
+        UserDto returnValue = new ModelMapper().map(updatedUserEntity, UserDto.class);
         return returnValue;
     }
 
@@ -126,8 +127,9 @@ public class UserServiceImpl implements UserService {
         List<UserEntity> userEntityList = usersPage.getContent();
 
         for (UserEntity userEntity : userEntityList) {
-            UserDto userDto = new UserDto();
-            BeanUtils.copyProperties(userEntity, userDto);
+//            UserDto userDto = new UserDto();
+//            BeanUtils.copyProperties(userEntity, userDto);
+            UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
             userDtoList.add(userDto);
         }
 
