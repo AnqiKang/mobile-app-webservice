@@ -1,21 +1,11 @@
-package com.kang.app.ws.model.response;
+package com.kang.app.ws.model.request;
 
-public class AddressRest {
-
-    private String addressId; // public id
+public class AddressRequestModel {
     private String city;
     private String country;
     private String streetName;
     private String postalCode;
     private String type;
-
-    public String getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(String addressId) {
-        this.addressId = addressId;
-    }
 
     public String getCity() {
         return city;

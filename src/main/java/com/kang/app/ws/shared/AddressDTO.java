@@ -1,13 +1,14 @@
-package com.kang.app.ws.model.response;
+package com.kang.app.ws.shared;
 
-public class AddressRest {
-
+public class AddressDTO {
+    private long id; // DB id
     private String addressId; // public id
     private String city;
     private String country;
     private String streetName;
     private String postalCode;
     private String type;
+    private UserDto userDetails;
 
     public String getAddressId() {
         return addressId;
@@ -15,6 +16,14 @@ public class AddressRest {
 
     public void setAddressId(String addressId) {
         this.addressId = addressId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getCity() {
@@ -55,5 +64,13 @@ public class AddressRest {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public UserDto getUserDetails() {
+        return userDetails;
+    }
+
+    public void setUserDetails(UserDto userDetails) {
+        this.userDetails = userDetails;
     }
 }

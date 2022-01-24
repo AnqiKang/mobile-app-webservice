@@ -1,6 +1,7 @@
 package com.kang.app.ws.shared;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * data transfer object
@@ -23,6 +24,16 @@ public class UserDto implements Serializable {
     private String encryptPassword;
     private String emailVerificationToken;
     private Boolean emailVerificationStatus = false;
+
+    private List<AddressDTO> addresses;
+
+    public List<AddressDTO> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressDTO> addresses) {
+        this.addresses = addresses;
+    }
 
     public long getId() {
         return id;
