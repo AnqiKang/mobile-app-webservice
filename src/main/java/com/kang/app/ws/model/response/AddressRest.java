@@ -1,6 +1,8 @@
 package com.kang.app.ws.model.response;
 
-public class AddressRest {
+import org.springframework.hateoas.RepresentationModel;
+
+public class AddressRest extends RepresentationModel<AddressRest> {
 
     private String addressId; // public id
     private String city;
