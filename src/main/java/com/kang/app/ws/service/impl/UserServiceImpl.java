@@ -57,6 +57,8 @@ public class UserServiceImpl implements UserService {
         String publicUserId = utils.generateUserId(30);
         userEntity.setUserId(publicUserId);
         userEntity.setEncryptPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
+        userEntity.setEmailVerificationStatus(false);
 
         UserEntity storedUserDetails = userRepository.save(userEntity);
         UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
@@ -72,7 +74,7 @@ public class UserServiceImpl implements UserService {
         }
         UserDto returnValue = new UserDto();
         BeanUtils.copyProperties(userEntity, returnValue);
-       // UserDto returnValue = new ModelMapper().map(userEntity, UserDto.class);
+        // UserDto returnValue = new ModelMapper().map(userEntity, UserDto.class);
 
         return returnValue;
     }
@@ -136,6 +138,23 @@ public class UserServiceImpl implements UserService {
         return userDtoList;
     }
 
+    @Override
+    public boolean verifyEmailToken(String token) {
+        boolean isVerified = false;
+
+        UserEntity userEntity = userRepository.findUserByEmailVerificationToken(token);
+        if (userEntity != null) {
+            boolean hasTokenExpired = Utils.hasTokenExpired(token);
+            if (!hasTokenExpired) {
+                userEntity.setEmailVerificationToken(null);
+                userEntity.setEmailVerificationStatus(Boolean.TRUE);
+                userRepository.save(userEntity);
+                isVerified = true;
+            }
+        }
+        return isVerified;
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -143,7 +162,10 @@ public class UserServiceImpl implements UserService {
         if (userEntity == null) {
             throw new UsernameNotFoundException(email);
         }
-        return new User(userEntity.getEmail(), userEntity.getEncryptPassword(), new ArrayList<>());
+
+        return new User(userEntity.getEmail(), userEntity.getEncryptPassword(), userEntity.getEmailVerificationStatus(),
+                true, true, true, new ArrayList<>());
+        //return new User(userEntity.getEmail(), userEntity.getEncryptPassword(), new ArrayList<>());
 
     }
 
