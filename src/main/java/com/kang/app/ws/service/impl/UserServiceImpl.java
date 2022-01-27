@@ -7,6 +7,7 @@ import com.kang.app.ws.model.response.ErrorMessages;
 import com.kang.app.ws.repository.UserRepository;
 import com.kang.app.ws.service.UserService;
 import com.kang.app.ws.shared.AddressDTO;
+import com.kang.app.ws.shared.AmazonSES;
 import com.kang.app.ws.shared.UserDto;
 import com.kang.app.ws.shared.Utils;
 import org.modelmapper.ModelMapper;
@@ -62,6 +63,9 @@ public class UserServiceImpl implements UserService {
 
         UserEntity storedUserDetails = userRepository.save(userEntity);
         UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
+
+        // Send an email message to user to verify their email address
+        new AmazonSES().verifyEmail(returnValue);
 
         return returnValue;
     }
