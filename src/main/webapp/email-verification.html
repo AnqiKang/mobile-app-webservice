@@ -15,14 +15,14 @@
         });
 
         function verifyToken(tokenValue) {
-            $.get('http://localhost:8080/mobile-app-ws/users/email-verification', {token: tokenValue})
+            $.get('http://ec2-18-117-190-247.us-east-2.compute.amazonaws.com:8080/mobile-app-ws/users/email-verification', {token: tokenValue})
                 .done(function (response) {
                     if (response["operationResult"] === "SUCCESS") {
-                        $("#not-successful-result").attr("style", "display:none !important;");
+                        $("#non-successful-result").attr("style", "display:none !important;");
                         $("#successful-result").attr("style", "display:block !important;");
                     } else {
                         $("#successful-result").attr("style", "display:none !important;");
-                        $("#not-successful-result").attr("style", "display:block !important;");
+                        $("#non-successful-result").attr("style", "display:block !important;");
                     }
                 });
         }
