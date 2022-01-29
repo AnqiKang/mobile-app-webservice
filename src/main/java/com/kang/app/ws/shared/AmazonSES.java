@@ -46,8 +46,8 @@ public class AmazonSES {
             + " Thank you!";
 
     public void verifyEmail(UserDto userDto) {
-        System.setProperty("aws.accessKeyId", "AKIAUQQMXLILTEVUGVVN");
-        System.setProperty("aws.secretKey", "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");
+        System.setProperty("aws.accessKeyId", "XXXX");
+        System.setProperty("aws.secretKey", "XXXX");
         AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(Regions.US_EAST_2).build();
         String htmlBodyWithToken = HTMLBODY.replace("$tokenValue", userDto.getEmailVerificationToken());
         String textBodyWithToken = TEXTBODY.replace("$tokenValue", userDto.getEmailVerificationToken());
