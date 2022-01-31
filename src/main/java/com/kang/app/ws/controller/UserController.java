@@ -1,6 +1,7 @@
 package com.kang.app.ws.controller;
 
 import com.kang.app.ws.exceptions.UserServiceException;
+import com.kang.app.ws.model.request.PasswordResetModel;
 import com.kang.app.ws.model.request.PasswordResetRequestModel;
 import com.kang.app.ws.model.request.UserDetailsRequestModel;
 import com.kang.app.ws.model.response.*;
@@ -210,5 +211,26 @@ public class UserController {
 
         return returnValue;
     }
+
+    @PostMapping(path = "/password-reset",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
+    )
+    public OperationStatusModel resetPassword(@RequestBody PasswordResetModel passwordResetModel) {
+        OperationStatusModel returnValue = new OperationStatusModel();
+
+        boolean operationResult = userService.resetPassword(
+                passwordResetModel.getToken(),
+                passwordResetModel.getPassword());
+
+        returnValue.setOperationName(RequestOperationName.PASSWORD_RESET.name());
+        returnValue.setOperationResult(RequestOperationStatus.ERROR.name());
+
+        if (operationResult) {
+            returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        }
+
+        return returnValue;
+    }
+
 
 }
