@@ -1,5 +1,6 @@
 package com.kang.app.ws.service.impl;
 
+import com.kang.app.ws.entity.AddressEntity;
 import com.kang.app.ws.entity.UserEntity;
 import com.kang.app.ws.repository.PasswordResetTokenRepository;
 import com.kang.app.ws.repository.UserRepository;
@@ -13,15 +14,18 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class UserServiceImplTest {
 
@@ -38,6 +42,7 @@ class UserServiceImplTest {
     private String userId = "adgsiuy3g2uyeg";
     private String encryptedPassword = "wqdhjwqdgqduygewd";
     private UserEntity userEntity;
+    private String email = "kanganqi666@gmail.com";
 
 
     @BeforeEach
@@ -45,18 +50,21 @@ class UserServiceImplTest {
         MockitoAnnotations.openMocks(this);
         userEntity = new UserEntity();
         userEntity.setId(1L);
-        userEntity.setFirstName("Anqi");
+        userEntity.setFirstName("Karen");
+        userEntity.setLastName("Kang");
         userEntity.setUserId(userId);
         userEntity.setEncryptPassword(encryptedPassword);
-        userEntity.setEmail("kanganqi666@gmail.com");
+        userEntity.setEmail(email);
         userEntity.setEmailVerificationToken("diqdhiuwqhdiu");
+        userEntity.setAddresses(getAddressesEntity());
+
     }
 
     @Test
     void should_ThrowUsernameNotFoundException_WhenEmailNotFound() {
         when(userRepository.findByEmail(anyString())).thenThrow(UsernameNotFoundException.class);
 
-        Executable executable = () -> userService.getUser("kanganqi666@gmail.com");
+        Executable executable = () -> userService.getUser(email);
 
         assertThrows(UsernameNotFoundException.class, executable);
     }
@@ -65,7 +73,7 @@ class UserServiceImplTest {
     void should_ReturnCorrectUser_WhenGetUserByCorrectEmail() {
         when(userRepository.findByEmail(anyString())).thenReturn(userEntity);
 
-        UserDto userDto = userService.getUser("kanganqi666@gmail.com");
+        UserDto userDto = userService.getUser(email);
 
         assertAll(
                 () -> assertEquals(userEntity.getId(), userDto.getId()),
@@ -76,8 +84,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void should_ReturnCorrect_WhenCreateUser() {
-
+    void should_ReturnCorrect_WhenCreateUser_WithOneAddress() {
         when(userRepository.findByEmail(anyString())).thenReturn(null);
         when(utils.generateAddressId(anyInt())).thenReturn("hskqwshwkhswsh887");
         when(utils.generateUserId(anyInt())).thenReturn(userId);
@@ -100,7 +107,65 @@ class UserServiceImplTest {
                 () -> assertEquals(userEntity.getFirstName(), storedUserDetails.getFirstName())
         );
 
+    }
 
+    @Test
+    void should_ReturnCorrect_WhenCreateUser_WithAllFieldsOf2AddressRequestModel() {
+
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
+        when(utils.generateAddressId(anyInt())).thenReturn("hskqwshwkhswsh887");
+        when(utils.generateUserId(anyInt())).thenReturn(userId);
+        when(bCryptPasswordEncoder.encode(anyString())).thenReturn(encryptedPassword);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+
+        UserDto userDto = new UserDto();
+        userDto.setAddresses(getAddressesDto());
+        userDto.setFirstName("Karen");
+        userDto.setLastName("Kang");
+        userDto.setPassword("12345678");
+        userDto.setEmail(email);
+
+        UserDto storedUserDetails = userService.createUser(userDto);
+
+        assertAll(
+                () -> assertNotNull(storedUserDetails),
+                () -> assertEquals(userEntity.getFirstName(), storedUserDetails.getFirstName()),
+                () -> assertEquals(userEntity.getLastName(), storedUserDetails.getLastName()),
+                () -> assertNotNull(storedUserDetails.getUserId()),
+                () -> assertEquals(storedUserDetails.getAddresses().size(), userEntity.getAddresses().size()),
+                () -> verify(utils, times(storedUserDetails.getAddresses().size())).generateAddressId(30),
+                () -> verify(bCryptPasswordEncoder, times(1)).encode("12345678"),
+                ()-> verify(userRepository,times(1)).save(any())
+        );
+
+    }
+
+    private List<AddressDTO> getAddressesDto() {
+        AddressDTO shippingAddressDTO = new AddressDTO();
+        shippingAddressDTO.setType("shipping");
+        shippingAddressDTO.setCity("Fort Collins");
+        shippingAddressDTO.setCountry("Colorado");
+        shippingAddressDTO.setPostalCode("80521");
+        shippingAddressDTO.setStreetName("1600 W Plum");
+
+        AddressDTO billingAddressDTO = new AddressDTO();
+        billingAddressDTO.setType("billing");
+        billingAddressDTO.setCity("Fort Collins");
+        billingAddressDTO.setCountry("Colorado");
+        billingAddressDTO.setPostalCode("80521");
+        billingAddressDTO.setStreetName("1600 W Plum");
+
+        List<AddressDTO> addressDTOList = new ArrayList<>();
+        addressDTOList.add(shippingAddressDTO);
+        addressDTOList.add(billingAddressDTO);
+        return addressDTOList;
+    }
+
+    private List<AddressEntity> getAddressesEntity() {
+        List<AddressDTO> addressDTOList = getAddressesDto();
+        Type listTye = new TypeToken<List<AddressEntity>>() {
+        }.getType();
+        return new ModelMapper().map(addressDTOList, listTye);
     }
 
 
