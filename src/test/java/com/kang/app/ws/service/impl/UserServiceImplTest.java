@@ -2,6 +2,7 @@ package com.kang.app.ws.service.impl;
 
 import com.kang.app.ws.entity.AddressEntity;
 import com.kang.app.ws.entity.UserEntity;
+import com.kang.app.ws.exceptions.UserServiceException;
 import com.kang.app.ws.repository.PasswordResetTokenRepository;
 import com.kang.app.ws.repository.UserRepository;
 import com.kang.app.ws.service.UserService;
@@ -74,6 +75,23 @@ class UserServiceImplTest {
     }
 
     @Test
+    void createUser_Should_ThrownUserServiceException_WhenFindEmail() {
+        when(userRepository.findByEmail(anyString())).thenReturn(userEntity);
+
+        UserDto userDto = new UserDto();
+        userDto.setAddresses(getAddressesDto());
+        userDto.setFirstName("Karen");
+        userDto.setLastName("Kang");
+        userDto.setPassword("12345678");
+        userDto.setEmail(email);
+
+        Executable executable = () -> userService.createUser(userDto);
+
+        assertThrows(UserServiceException.class, executable);
+
+    }
+
+    @Test
     void should_ReturnCorrectUser_WhenGetUserByCorrectEmail() {
         when(userRepository.findByEmail(anyString())).thenReturn(userEntity);
 
@@ -141,7 +159,7 @@ class UserServiceImplTest {
                 () -> assertEquals(storedUserDetails.getAddresses().size(), userEntity.getAddresses().size()),
                 () -> verify(utils, times(storedUserDetails.getAddresses().size())).generateAddressId(30),
                 () -> verify(bCryptPasswordEncoder, times(1)).encode("12345678"),
-                ()-> verify(userRepository,times(1)).save(any())
+                () -> verify(userRepository, times(1)).save(any())
         );
 
     }
