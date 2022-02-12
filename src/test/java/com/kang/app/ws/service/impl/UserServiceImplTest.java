@@ -6,6 +6,7 @@ import com.kang.app.ws.repository.PasswordResetTokenRepository;
 import com.kang.app.ws.repository.UserRepository;
 import com.kang.app.ws.service.UserService;
 import com.kang.app.ws.shared.AddressDTO;
+import com.kang.app.ws.shared.AmazonSES;
 import com.kang.app.ws.shared.UserDto;
 import com.kang.app.ws.shared.Utils;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,9 @@ class UserServiceImplTest {
     private Utils utils;
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Mock
+    private AmazonSES amazonSES;
 
     private String userId = "adgsiuy3g2uyeg";
     private String encryptedPassword = "wqdhjwqdgqduygewd";
@@ -90,6 +94,7 @@ class UserServiceImplTest {
         when(utils.generateUserId(anyInt())).thenReturn(userId);
         when(bCryptPasswordEncoder.encode(anyString())).thenReturn(encryptedPassword);
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        doNothing().when(amazonSES).verifyEmail(any());
 
         AddressDTO addressDTO = new AddressDTO();
         addressDTO.setType("shipping");
@@ -117,6 +122,7 @@ class UserServiceImplTest {
         when(utils.generateUserId(anyInt())).thenReturn(userId);
         when(bCryptPasswordEncoder.encode(anyString())).thenReturn(encryptedPassword);
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        doNothing().when(amazonSES).verifyEmail(any());
 
         UserDto userDto = new UserDto();
         userDto.setAddresses(getAddressesDto());

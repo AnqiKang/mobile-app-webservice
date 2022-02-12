@@ -4,7 +4,9 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AmazonSES {
     // this address must be verified with AWS SES.
     final String FROM = "kanganqi666@gmail.com";

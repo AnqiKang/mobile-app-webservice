@@ -33,14 +33,17 @@ public class UserServiceImpl implements UserService {
     private final Utils utils;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AmazonSES amazonSES;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, Utils utils,
-                           BCryptPasswordEncoder bCryptPasswordEncoder, PasswordResetTokenRepository passwordResetTokenRepository) {
+                           BCryptPasswordEncoder bCryptPasswordEncoder, PasswordResetTokenRepository passwordResetTokenRepository,
+                           AmazonSES amazonSES) {
         this.userRepository = userRepository;
         this.utils = utils;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.amazonSES = amazonSES;
     }
 
     @Override
@@ -69,7 +72,8 @@ public class UserServiceImpl implements UserService {
         UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
 
         // Send an email message to user to verify their email address
-        new AmazonSES().verifyEmail(returnValue);
+        // new AmazonSES().verifyEmail(returnValue);
+        amazonSES.verifyEmail(returnValue);
 
         return returnValue;
     }
